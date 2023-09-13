@@ -351,6 +351,8 @@
 "Assets/Scripts/Base Datas/EnumTypes.cs"
 "Assets/Scripts/Base Datas/ScriptableObjects.cs"
 "Assets/Scripts/Base Datas/Structs.cs"
+"Assets/Scripts/Managers/CharacterController.cs"
+"Assets/Scripts/Managers/GameManager.cs"
 -langversion:9.0
 
 /deterministic

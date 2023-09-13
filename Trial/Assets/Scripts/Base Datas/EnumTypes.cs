@@ -8,4 +8,8 @@ namespace EnumTypes
     {
         Floor,Column,Wall,Tower
     }
+    public enum GameStates
+    {
+        Idle,Pause,Slow
+    }
 }

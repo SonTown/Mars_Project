@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 using EnumTypes;
 
 namespace Structs
 {
-    public struct Craftstat: IComparable
+    public struct Craftstat: IComparable<Craftstat>
     {
         public int HP;
         public int level;
