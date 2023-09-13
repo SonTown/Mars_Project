@@ -35,6 +35,7 @@ public class GameManager : BaseMonoBehaviour
     public void SlowGame(float Gamespeed)
     {
         gamestate = GameStates.Slow;
+        Debug.Log(Gamespeed);
         Time.timeScale = Gamespeed;
     }
 }
