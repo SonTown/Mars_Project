@@ -6,6 +6,7 @@ using Character_Function;
 
 public class CharacterController : MonoBehaviour
 {
+    //이동 속도 및 기타 스테이터스 관리 파트
     public float moveSpeed = 5f;
     public float rotationSpeed = 30f;
     public float maxSpeed;
@@ -14,23 +15,28 @@ public class CharacterController : MonoBehaviour
     public PlayerStates currentState=PlayerStates.Build;
 
     //화면 컨트롤을 통한 이동을 위한 변수들
+    //현재 움직임 여부 체크
     private bool isMove=false;
     private bool isRotate=false;
+    //Touch를 처리할 index 값
     private int moveTouch_index = -1;
     private int rotateTouch_index = -1;
+    //Touch와 이동을 위한 벡터 데이터
     private Touch MoveTouch;
     private Touch RotateTouch;
     private Vector3 startPosition;
     private Vector3 moveVector;
-    private Vector3 startRotation;
     private Vector3 rotateVector;
 
     //craft 기능을 위한 변수들
+    //Craft를 위한 좌표 설정을 위한 변수들
     private RaycastHit Selected;
-    private float range=5f;
-    private string Craftlayer = Globals.LayerName.Craft;
+    private float range=10f;
     private Vector3 craftPoint;
+    private string Craftlayer = Globals.LayerName.Craft;
     private Ray targetingRay;
+    private float lattice_length = 4f;
+    //제작 연습용 데이터들
     public GameObject Prefab;
     public GameObject Prefab2;
     private Build_Function build_Func = new Build_Function();
@@ -56,7 +62,6 @@ public class CharacterController : MonoBehaviour
                     else
                     {
                         rotateTouch_index = i;
-                        startRotation = touch.position;
                         rotateVector = Vector3.zero;
                         isRotate = true;
                     }
@@ -77,7 +82,7 @@ public class CharacterController : MonoBehaviour
                     }
                 }
             }
-            if (isMove == true)
+            if (isMove == true && moveTouch_index != -1)
             {
                 MoveTouch = Input.GetTouch(moveTouch_index);
                 // 왼손 터치로 캐릭터 이동
@@ -95,12 +100,12 @@ public class CharacterController : MonoBehaviour
                     transform.Translate(moveVector * moveSpeed * Time.deltaTime);
                 }
             }
-            if (isRotate == true)
+            if (isRotate == true&&rotateTouch_index!=-1)
             {
                 RotateTouch = Input.GetTouch(rotateTouch_index);
                 if (RotateTouch.phase == TouchPhase.Moved)
                 {
-                    rotateVector = new Vector3(-RotateTouch.position.y + startRotation.y, RotateTouch.position.x - startRotation.x,0);
+                    rotateVector = new Vector3(-RotateTouch.deltaPosition.y, RotateTouch.deltaPosition.x,0);
                     if (rotateVector.magnitude > maxRotSpeed)
                     {
                         rotateVector = rotateVector.normalized * maxRotSpeed;
@@ -110,8 +115,7 @@ public class CharacterController : MonoBehaviour
                 }
                 else if (MoveTouch.phase == TouchPhase.Stationary)
                 {
-                    cam.transform.Rotate(rotateVector.x * maxRotSpeed * Time.deltaTime, 0, 0, Space.Self);
-                    transform.Rotate(0, rotateVector.y * maxRotSpeed * Time.deltaTime, 0, Space.Self);
+                    
                 }
             }
         }
@@ -121,8 +125,8 @@ public class CharacterController : MonoBehaviour
             case PlayerStates.Build:
                 if (build_Func.BuildPosition(cam,out available_Position, range, Craftlayer))
                 {
-                    Prefab2.transform.position=available_Position;
-                    Prefab.transform.position = new Vector3(Utilites.floatoN(available_Position.x, 1, 0), Utilites.floatoN(available_Position.y, 1, 0), Utilites.floatoN(available_Position.z, 1, 0));
+                    //Prefab2.transform.position=available_Position;
+                    Prefab.transform.position = new Vector3(Utilites.floatoN(available_Position.x,lattice_length, 0), Utilites.floatoN(available_Position.y, lattice_length, 0), Utilites.floatoN(available_Position.z, lattice_length, 0));
                 }
                 break;
             case PlayerStates.Fight:
