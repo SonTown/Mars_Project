@@ -6,10 +6,14 @@ namespace EnumTypes
 {
     public enum CraftTypes
     {
-        Floor,Column,Wall,Tower
+        Floor, Column, Wall, Tower
     }
     public enum GameStates
     {
-        Idle,Pause,Slow
+        Idle, Pause, Slow
+    }
+    public enum PlayerStates
+    {
+        Idle, Build, Fight
     }
 }
