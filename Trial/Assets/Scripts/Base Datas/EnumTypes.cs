@@ -16,4 +16,8 @@ namespace EnumTypes
     {
         Idle, Build, Fight
     }
+    public enum BuildResources
+    {
+        Iron, Copper, Nickel, Titanium, aluminum, Tungsten, diamond, platinum, uranium
+    }
 }

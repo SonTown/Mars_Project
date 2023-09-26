@@ -2,9 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using EnumTypes;
+using UnityEngine.EventSystems;
 using Character_Function;
+using Structs;
 
-public class CharacterController : MonoBehaviour
+public class CharacterController : BaseMonoBehaviour
 {
     //이동 속도 및 기타 스테이터스 관리 파트
     public float moveSpeed = 5f;
@@ -21,6 +23,8 @@ public class CharacterController : MonoBehaviour
     //Touch를 처리할 index 값
     private int moveTouch_index = -1;
     private int rotateTouch_index = -1;
+    private int moveTouch_fingerId = -1;
+    private int rotateTouch_fingerId = -1;
     //Touch와 이동을 위한 벡터 데이터
     private Touch MoveTouch;
     private Touch RotateTouch;
@@ -52,34 +56,51 @@ public class CharacterController : MonoBehaviour
                 Touch touch = Input.GetTouch(i);
                 if (touch.phase == TouchPhase.Began)
                 {
+                    if (EventSystem.current.IsPointerOverGameObject(touch.fingerId))
+                    {
+                        // UGUI 요소 위에서 터치가 발생한 경우, 해당 입력을 무시
+                        continue;
+                    }
                     if (touch.position.x < Screen.width / 2f)
                     {
-                        moveTouch_index = i;
+                        moveTouch_fingerId = touch.fingerId;
                         startPosition = touch.position;
                         moveVector = Vector3.zero;
                         isMove = true;
+                        moveTouch_index = i;
                     }
                     else
                     {
-                        rotateTouch_index = i;
+                        rotateTouch_fingerId = touch.fingerId;
                         rotateVector = Vector3.zero;
                         isRotate = true;
+                        rotateTouch_index = i;
                     }
                 }
                 else if(touch.phase == TouchPhase.Ended)
                 {
-                    if (moveTouch_index == i)
+                    if (moveTouch_fingerId == touch.fingerId)
                     {
                         moveTouch_index = -1;
+                        moveTouch_fingerId = -1;
                         moveVector = Vector3.zero;
                         isMove = false;
                     }
-                    if (rotateTouch_index == i)
+                    if (rotateTouch_fingerId == touch.fingerId)
                     {
                         rotateTouch_index = -1;
+                        rotateTouch_fingerId = -1;
                         rotateVector = Vector3.zero;
                         isRotate = false;
                     }
+                }
+                else if (touch.fingerId == moveTouch_fingerId)
+                {
+                    moveTouch_index = i;
+                }
+                else if (touch.fingerId == rotateTouch_fingerId)
+                {
+                    rotateTouch_index = i;
                 }
             }
             if (isMove == true && moveTouch_index != -1)
@@ -136,6 +157,9 @@ public class CharacterController : MonoBehaviour
         {
 
             GameManager.Instance.SlowGame(0.1f);
+            CraftUIinfo[] craft=new CraftUIinfo[1];
+           // craft[0] = new CraftUIinfo("Floor", "Floor");
+            //GameManager._Craft_instance.Content_Change(craft);
 
         }
     }
