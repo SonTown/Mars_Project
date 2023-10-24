@@ -21,7 +21,7 @@ public class TooltipManager : MonoBehaviour
     private void Awake()
     {
         canvas = FindObjectOfType<Canvas>();
-        Tooltip = Resources.Load<GameObject>("Button");
+        Tooltip = Resources.Load<GameObject>("Tooltip");
         Tooltip = Instantiate(Tooltip,canvas.transform);
         Tooltip.transform.position = new Vector3(0, 0, 0);
         Tooltip.SetActive(false);
@@ -31,7 +31,9 @@ public class TooltipManager : MonoBehaviour
         Tooltip.SetActive(true);
         // 툴팁 내용 업데이트
         TMP_Text tooltipText = Tooltip.GetComponentInChildren<TMP_Text>();
-        tooltipText.transform.position = new Vector3(0, 0, 0);
+        string content_with_lines = content.Replace("\\n", "\n");
+        tooltipText.text = content_with_lines;
+        Tooltip.transform.position = new Vector3(Screen.width / 2, Screen.height / 2, 0);
     }
 
     public void HideTooltip()

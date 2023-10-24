@@ -57,4 +57,26 @@ namespace Structs
         }
 
     }
+    public struct Dataset_craft
+    {
+        public string[] item_name;
+        public int[,] item_num;
+        public Dataset_craft(string[] Item_name, int[,] Item_num)
+        {
+            item_name = Item_name;
+            item_num = Item_num;
+        }
+    }
+    public struct Craft
+    {
+        public int Level;
+        public string type;
+        public int HP;
+        public int DEF;
+    }
+    public struct Item_Count
+    {
+        public int[] Resources;
+
+    }
 }

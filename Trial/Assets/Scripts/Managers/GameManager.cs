@@ -17,6 +17,12 @@ public class GameManager : BaseMonoBehaviour,IGameManager
 
     [SerializeField]
     private CraftScrollviewManager _craftScrollviewManager;
+
+    [SerializeField]
+    private CharacterManager _characterManager;
+
+    [SerializeField]
+    private CraftManager _craftManager;
     public static GameManager Instance
     {
         get
@@ -41,7 +47,9 @@ public class GameManager : BaseMonoBehaviour,IGameManager
             DontDestroyOnLoad(gameObject);
             _dataManager = gameObject.AddComponent<DataManager>();
             _craftScrollviewManager = FindObjectOfType<CraftScrollviewManager>();
+            _characterManager = FindObjectOfType<CharacterManager>();
             _tooltipManager = gameObject.AddComponent<TooltipManager>();
+            _craftManager = gameObject.AddComponent<CraftManager>();
         }
         else
         {
@@ -55,6 +63,7 @@ public class GameManager : BaseMonoBehaviour,IGameManager
         _dataManager.Init(this);
         _tooltipManager.Init(this);
         _craftScrollviewManager.Init(this);
+        _characterManager.Init(this);
     }
     #endregion
     private GameStates gamestate = GameStates.Idle;
@@ -88,6 +97,14 @@ public class GameManager : BaseMonoBehaviour,IGameManager
     public DataManager GetDataManager()
     {
         return _dataManager;
+    }
+    public CharacterManager GetCharacterManager()
+    {
+        return _characterManager;
+    }
+    public CraftManager GetCraftManager()
+    {
+        return _craftManager;
     }
 
     #endregion

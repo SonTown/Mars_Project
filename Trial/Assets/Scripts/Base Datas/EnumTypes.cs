@@ -6,7 +6,7 @@ namespace EnumTypes
 {
     public enum CraftTypes
     {
-        Floor, Column, Wall, Tower
+        Floor, Column, Wall, Tower,Turret,Others
     }
     public enum GameStates
     {

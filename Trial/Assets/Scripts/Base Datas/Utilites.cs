@@ -17,7 +17,7 @@ public static class Utilites
             if (Physics.Raycast(sourcePosition, sourceDirection, out hit, rayLength, LayerNametoNum(layer)))
             {
                 // 충돌한 게임 오브젝트를 반환합니다.
-                if (hit.collider.gameObject.layer == LayerNametoNum(layer))
+                if (hit.collider.gameObject.layer == LayerMask.NameToLayer(layer))
                 {
                     targetObject = hit.collider.gameObject;
                     return true;

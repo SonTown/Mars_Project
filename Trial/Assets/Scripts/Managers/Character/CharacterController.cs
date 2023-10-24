@@ -5,16 +5,20 @@ using EnumTypes;
 using UnityEngine.EventSystems;
 using Character_Function;
 using Structs;
+using System;
 
 public class CharacterController : BaseMonoBehaviour
 {
+    private CharacterManager characterManager;
+    private PreBuildControl preBuild;
     //이동 속도 및 기타 스테이터스 관리 파트
     public float moveSpeed = 5f;
     public float rotationSpeed = 30f;
     public float maxSpeed;
     public float maxRotSpeed;
     public GameObject cam;
-    public PlayerStates currentState=PlayerStates.Build;
+    private PlayerStates currentState=PlayerStates.Build;
+    private CraftTypes currentCraft = CraftTypes.Floor;
 
     //화면 컨트롤을 통한 이동을 위한 변수들
     //현재 움직임 여부 체크
@@ -39,18 +43,42 @@ public class CharacterController : BaseMonoBehaviour
     private Vector3 craftPoint;
     private string Craftlayer = Globals.LayerName.Craft;
     private Ray targetingRay;
-    private float lattice_length = 4f;
+    public InfoButton infoButton;
+    //정보 띄우기 위한 버튼 활성화 여부
     //제작 연습용 데이터들
     public GameObject Prefab;
     public GameObject Prefab2;
     private Build_Function build_Func = new Build_Function();
     private Vector3 available_Position;
+    public void Init(CharacterManager charactermanager)
+    {
+        characterManager = charactermanager;
+    }
+    private void Awake()
+    {
+        currentCraft = GameManager.Instance.GetCharacterManager().craftType;
+        print(GameManager.Instance);
+        print(GameManager.Instance.GetCraftManager());
+        print(GameManager.Instance.GetCraftManager().GetPreBuild());
+        preBuild = GameManager.Instance.GetCraftManager().GetPreBuild();
+        infoButton = FindObjectOfType<InfoButton>();
+        infoButton.transform.gameObject.SetActive(true);
+    }
+    private string text;
+    private bool isLookingCraft;
+    private GameObject craft;
+    private GameObject lookingCraft;
+    private Dataset_craft dataSave;
     private void Update()
     {
+
         // Touch Control Part- Control move and other things
         if (Input.touchCount > 0)
         {
-
+            if (Input.touchCount > 1)
+            {
+                GameManager.Instance.SlowGame(1f);
+            }
             for (int i = 0; i < Input.touchCount; i++)
             {
                 Touch touch = Input.GetTouch(i);
@@ -144,10 +172,31 @@ public class CharacterController : BaseMonoBehaviour
         switch (currentState)
         {
             case PlayerStates.Build:
-                if (build_Func.BuildPosition(cam,out available_Position, range, Craftlayer))
+                if (build_Func.BuildPosition(cam, out available_Position, out craft, range, Craftlayer))
                 {
-                    //Prefab2.transform.position=available_Position;
-                    Prefab.transform.position = new Vector3(Utilites.floatoN(available_Position.x,lattice_length, 0), Utilites.floatoN(available_Position.y, lattice_length, 0), Utilites.floatoN(available_Position.z, lattice_length, 0));
+                    infoButton.transform.gameObject.SetActive(true);
+                    
+                    if (lookingCraft != null)
+                    {
+                        if(lookingCraft != craft)
+                        {
+                            GameManager.Instance.GetTooltipManager().HideTooltip();
+                            isLookingCraft = false;
+                            lookingCraft = null;
+                        }
+                    }
+                    isLookingCraft = true;
+                }
+                else
+                {
+                    if (isLookingCraft)
+                    {
+                        GameManager.Instance.GetTooltipManager().HideTooltip();
+                        isLookingCraft = false;
+                        lookingCraft = null;
+                        infoButton.transform.gameObject.SetActive(false);
+                    }
+                    preBuild.PositionControl(available_Position, characterManager.craftType);
                 }
                 break;
             case PlayerStates.Fight:
@@ -155,12 +204,31 @@ public class CharacterController : BaseMonoBehaviour
         }
         if (Input.GetKeyDown(KeyCode.Space))
         {
-
-            GameManager.Instance.SlowGame(0.1f);
-            CraftUIinfo[] craft=new CraftUIinfo[1];
-           // craft[0] = new CraftUIinfo("Floor", "Floor");
-            //GameManager._Craft_instance.Content_Change(craft);
+            GameManager.Instance.SlowGame(1f);
 
         }
+    }
+    public bool InfoActivate()
+    {
+        if (isLookingCraft)
+        {
+            lookingCraft = craft;
+            text = "<size=40>Level: " + (craft.GetComponentInParent<Craft_Data>().craft.Level).ToString() + "</size>\n";
+            text += "<size=20>HP: " + (craft.GetComponentInParent<Craft_Data>().craft.HP).ToString() + "</size>\n";
+            dataSave = GameManager.Instance.GetDataManager().craftRequests[(CraftTypes)Enum.Parse(typeof(CraftTypes), craft.GetComponentInParent<Craft_Data>().craft.type)];
+            text += "<size=10>";
+            for (int i = 0; i < dataSave.item_name.Length; i++)
+            {
+                if (dataSave.item_name[i] == null)
+                {
+                    continue;
+                }
+                text = text + dataSave.item_name[i] + ": " + dataSave.item_num[craft.GetComponentInParent<Craft_Data>().craft.Level + 1, i] + "piece needed\n";
+            }
+            text += "</size>";
+            GameManager.Instance.GetTooltipManager().ShowTooltip(text);
+            return true;
+        }
+        return false;
     }
 }
